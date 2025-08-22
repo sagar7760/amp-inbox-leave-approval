@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+env/
+ENV/
+.conda/
+.python-version
+
+# Packaging
+build/
+dist/
+.eggs/
+*.egg-info/
+pip-wheel-metadata/
+wheelhouse/
+
+# Testing
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Type checking / linters
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+dmypy.json
+.dmypy.json
+
+# Logs
+*.log
+log/
+logs/
+
+# IDE / Editors
+.vscode/
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+
+# Cache
+.cache/
+__pypackages__/
+.pybuilder/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local data/temp
+data/
+tmp/
+temp/
+
+# Heroku
+.heroku/

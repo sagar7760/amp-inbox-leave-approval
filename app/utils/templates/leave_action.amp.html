@@ -1,0 +1,27 @@
+<!doctype html>
+<html ⚡4email>
+<head>
+  <meta charset="utf-8">
+  <script async src="https://cdn.ampproject.org/v0.js"></script>
+  <script async custom-element="amp-form" src="https://cdn.ampproject.org/v0/amp-form-0.1.js"></script>
+  <style amp4email-boilerplate>body{visibility:hidden}</style>
+  <style amp-custom>
+    body { font-family: Arial, sans-serif; }
+    .container { padding: 20px; }
+    .btn { padding: 10px 20px; margin: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Leave Request Approval</h2>
+    <p>Employee: {{ leave.employee_id }}</p>
+    <p>Reason: {{ leave.reason }}</p>
+    <form method="POST" action="https://your-backend-url/leave/action/{{ leave._id }}" target="_top" amp-form>
+      <input type="hidden" name="approver_id" value="{{ leave.manager_id }}" />
+      <label>Password: <input type="password" name="password" required /></label><br><br>
+      <button class="btn" type="submit" name="action" value="approved">Approve</button>
+      <button class="btn" type="submit" name="action" value="rejected">Reject</button>
+    </form>
+  </div>
+</body>
+</html>
