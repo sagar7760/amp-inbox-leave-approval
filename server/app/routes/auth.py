@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from app.models.db import users_collection
 from app.models.schemas import Token, UserCreate
-from app.utils.auth import verify_password, get_password_hash, create_access_token
+from app.utils.auth import verify_password, get_password_hash, create_access_token, verify_token
 from bson import ObjectId
 from datetime import timedelta
 import os
@@ -51,3 +51,45 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
         expires_delta=timedelta(minutes=60*24)
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me")
+def get_current_user(user_id: str = Depends(verify_token)):
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Return user data without password
+    user_data = {
+        "id": str(user["_id"]),
+        "username": user["username"],
+        "email": user["email"],
+        "full_name": user["full_name"],
+        "role": user["role"],
+        "department": user["department"],
+        "is_manager": user.get("is_manager", False),
+        "is_hr": user.get("is_hr", False)
+    }
+    
+    return user_data
+
+@router.post("/test-email")
+def test_email():
+    """Test endpoint to verify email configuration"""
+    try:
+        from app.utils.email import send_leave_action_email
+        
+        # Create test leave data
+        test_leave = {
+            "employee_name": "Test Employee",
+            "manager_email": "sagarsoradi011@gmail.com",  # Send to your own email for testing
+            "leave_type": "Annual Leave",
+            "start_date": "2025-09-01",
+            "end_date": "2025-09-03",
+            "reason": "Family vacation - This is a test email"
+        }
+        
+        send_leave_action_email(test_leave)
+        return {"message": "Test email sent successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Email test failed: {str(e)}")

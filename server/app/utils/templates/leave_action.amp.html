@@ -1,26 +1,177 @@
 <!doctype html>
-<html ⚡4email>
+<html ⚡4email data-css-strict>
 <head>
   <meta charset="utf-8">
   <script async src="https://cdn.ampproject.org/v0.js"></script>
   <script async custom-element="amp-form" src="https://cdn.ampproject.org/v0/amp-form-0.1.js"></script>
+  <script async custom-template="amp-mustache" src="https://cdn.ampproject.org/v0/amp-mustache-0.2.js"></script>
+  
   <style amp4email-boilerplate>body{visibility:hidden}</style>
+  
   <style amp-custom>
-    body { font-family: Arial, sans-serif; }
-    .container { padding: 20px; }
-    .btn { padding: 10px 20px; margin: 5px; }
+    /* New styling based on the previous working template */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #1a1a1a;
+      color: #ffffff;
+      margin: 0;
+      padding: 20px;
+    }
+    .email-card {
+      background: #2d2d2d;
+      border-radius: 12px;
+      padding: 50px;
+      border: 1px solid #444;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .header h1 {
+      color: #60a5fa;
+      font-size: 28px;
+      margin: 0 0 10px 0;
+    }
+    .header p {
+      color: #9ca3af;
+      margin: 0;
+    }
+    .info-group {
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+    .info-label {
+        font-weight: 600;
+        color: #e5e7eb;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      color: #e5e7eb;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .form-input {
+      width: 60%;
+      position:center;
+      padding: 12px;
+      border: 2px solid #555;
+      border-radius: 6px;
+      background: #3a3a3a;
+      color: #ffffff;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .form-input:focus {
+      border-color: #60a5fa;
+      outline: none;
+    }
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .submit-btn {
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 40%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .submit-btn:hover {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+    .submit-btn.reject {
+      background: linear-gradient(135deg, #ff6b6b 0%, #cc0000 100%);
+    }
+    .submit-btn.reject:hover {
+      background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+    }
+    .success-msg, .error-msg {
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .success-msg {
+      background: #065f46;
+      border: 1px solid #059669;
+      color: #d1fae5;
+    }
+    .error-msg {
+      background: #7f1d1d;
+      border: 1px solid #dc2626;
+      color: #fecaca;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Leave Request Approval</h2>
-    <p>Employee: {{ leave.employee_id }}</p>
-    <p>Reason: {{ leave.reason }}</p>
-    <form method="POST" action="https://your-backend-url/leave/action/{{ leave._id }}" target="_top" amp-form>
-      <input type="hidden" name="approver_id" value="{{ leave.manager_id }}" />
-      <label>Password: <input type="password" name="password" required /></label><br><br>
-      <button class="btn" type="submit" name="action" value="approved">Approve</button>
-      <button class="btn" type="submit" name="action" value="rejected">Reject</button>
+  <div class="email-card">
+    <div class="header">
+      <h1>Leave Request Approval</h1>
+    </div>
+
+    <div class="info-group">
+      <p><span class="info-label">Employee:</span> {{ leave.employee_name }}</p>
+      <p><span class="info-label">Department:</span> {{ leave.employee_department }}</p>
+      <p><span class="info-label">Leave Type:</span> {{ leave.leave_type }}</p>
+      <p><span class="info-label">Start Date:</span> {{ leave.start_date }}</p>
+      <p><span class="info-label">End Date:</span> {{ leave.end_date }}</p>
+      <p><span class="info-label">Reason:</span> {{ leave.reason }}</p>
+    </div>
+
+    <!--
+      FIXED: The 'action-xhr' attribute is now used instead of 'action'.
+      You must replace the placeholder with your actual server endpoint.
+    -->
+    <form method="POST" action-xhr="https://localhost:8000/leave/approve-from-email">
+      <input type="hidden" name="leave_id" value="{{ leave._id }}" />
+      <input type="hidden" name="manager_id" value="{{ leave.manager_id }}" />
+      <div class="form-group">
+        <label class="form-label">Manager Password: <input class="form-input" type="text" name="password" required placeholder="Enter your password to approve" /></label>
+      </div>
+      
+      <div class="btn-group">
+        <!-- Only approval button for email, rejection will redirect to dashboard -->
+        <button class="submit-btn" type="submit" name="action" value="approved">Approve Leave</button>
+        <a href="http://localhost:5173/manager/dashboard" class="submit-btn reject" style="text-decoration: none; text-align: center; display: inline-block; line-height: 1.5;">Go to Dashboard to Reject</a>
+      </div>
+
+      <!--
+        Success and error messages are now handled by AMP's built-in templates.
+        Your server's JSON response will populate these messages.
+      -->
+      <div submit-success>
+        <template type="amp-mustache">
+          <div class="success-msg">
+            <strong>Success!</strong><br>
+            Leave request for {{employee_name}} has been approved successfully.<br>
+            The employee will be notified of your decision.
+          </div>
+        </template>
+      </div>
+
+      <div submit-error>
+        <template type="amp-mustache">
+          <div class="error-msg">
+            <strong>Error</strong><br>
+            {{message}}<br>
+            Please check your password and try again.
+          </div>
+        </template>
+      </div>
     </form>
   </div>
 </body>

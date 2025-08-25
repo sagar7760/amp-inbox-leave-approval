@@ -59,7 +59,6 @@ class LeaveRequest(BaseModel):
     created_at: Optional[str] = None
 
 class LeaveActionRequest(BaseModel):
-    manager_password: str
     comments: Optional[str] = None
 
 class Token(BaseModel):
