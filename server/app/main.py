@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request, Response
 from app.routes import leave, auth
 import os
 from dotenv import load_dotenv
@@ -7,6 +8,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI(title="Leave Approval System API", version="1.0.0")
+
+# AMP Email CORS Middleware
+@app.middleware("http")
+async def add_amp_cors_headers(request: Request, call_next):
+    response = await call_next(request)
+    
+    # Add AMP-specific CORS headers
+    if request.url.path.startswith("/leave/"):
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Expose-Headers"] = "*"
+        response.headers["AMP-Access-Control-Allow-Source-Origin"] = request.headers.get("Origin", "*")
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+    
+    return response
 
 # Get URLs from environment for CORS configuration
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
@@ -48,6 +65,12 @@ app.add_middleware(
         "AMP-CORS-REQUEST-HEADERS",  # Critical for AMP emails
         "AMP-Same-Origin",           # Critical for AMP emails
         "*"  # Allow all headers for AMP compatibility
+    ],
+    expose_headers=[
+        "AMP-Access-Control-Allow-Source-Origin",
+        "AMP-CORS-REQUEST-HEADERS",
+        "Access-Control-Expose-Headers",
+        "*"  # Expose all headers for AMP compatibility
     ],
 )
 

@@ -66,6 +66,12 @@ def send_leave_action_email(leave_dict):
         leave_dict['backend_url'] = backend_url
         leave_dict['frontend_url'] = frontend_url
         
+        print(f"🔧 DEBUG - Email Template URLs:")
+        print(f"   Backend URL: {backend_url}")
+        print(f"   Frontend URL: {frontend_url}")
+        print(f"   Approval Token: {approval_token[:8]}...")
+        print(f"   Rejection Token: {rejection_token[:8]}...")
+        
         # Render AMP email with embedded form
         template = env.get_template("leave_action.amp.html")
         html_content = template.render(leave=leave_dict)
