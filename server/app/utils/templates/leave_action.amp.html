@@ -150,7 +150,7 @@
         <label class="form-label">Manager Password:
           <input class="form-input" type="text" name="password" required placeholder="Enter your password to approve" />
         </label>
-        <small style="color: #9ca3af; font-size: 12px;">Password required for security verification</small>
+        <small style="color: #9ca3af; font-size: 12px;">Password required for security verification (visible for AMP compatibility)</small>
       </div>
       
       <div class="form-group">
@@ -185,49 +185,24 @@
     </form>
 
     <!--
-      Rejection form that redirects to manager dashboard for full rejection workflow.
+      Rejection link redirects to manager dashboard for full rejection workflow.
       This allows managers to add comments and handle rejection in the dashboard interface.
-      Uses AMP-compliant redirect method.
+      Uses direct link approach for AMP email compatibility.
     -->
-    <form method="POST" 
-          action-xhr="{{ leave.backend_url }}/leave/redirect-reject" 
-          on="submit-success:AMP.navigateTo(url=event.response.redirect_url)">
-      <input type="hidden" name="leave_id" value="{{ leave._id }}" />
-      <input type="hidden" name="token" value="{{ leave.rejection_token }}" />
-      <input type="hidden" name="frontend_url" value="{{ leave.frontend_url }}" />
-      
-      <div class="form-group" style="margin-top: 20px;">
-        <div class="btn-group">
-          <button class="submit-btn reject" type="submit">
-            Reject Leave
-          </button>
-        </div>
-        <div style="text-align: center; margin-top: 10px;">
-          <small style="color: #9ca3af; font-size: 12px;">
-            Opens manager dashboard for rejection with comments
-          </small>
-        </div>
+    <div class="form-group" style="margin-top: 20px;">
+      <div class="btn-group">
+        <a href="{{ leave.frontend_url }}/manager-dashboard?action=reject&leave_id={{ leave._id }}&token={{ leave.rejection_token }}" 
+           class="submit-btn reject" 
+           style="text-decoration: none; display: inline-block; text-align: center; line-height: 1.2;">
+          Reject Leave
+        </a>
       </div>
-      
-      <div submit-success>
-        <template type="amp-mustache">
-          <div class="success-msg">
-            <strong>Redirecting...</strong><br>
-            Opening manager dashboard for rejection workflow.
-          </div>
-        </template>
+      <div style="text-align: center; margin-top: 10px;">
+        <small style="color: #9ca3af; font-size: 12px;">
+          Opens manager dashboard in new tab for rejection with comments
+        </small>
       </div>
-
-      <div submit-error>
-        <template type="amp-mustache">
-          <div class="error-msg">
-            <strong>Error</strong><br>
-            {{message}}<br>
-            Please try again.
-          </div>
-        </template>
-      </div>
-    </form>
+    </div>
   </div>
 </body>
 </html>
