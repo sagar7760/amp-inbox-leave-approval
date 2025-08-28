@@ -72,3 +72,12 @@ class UserCreate(BaseModel):
     full_name: str
     role: str = "employee"
     department: str
+
+class ApprovalToken(BaseModel):
+    token: str
+    leave_id: str
+    manager_id: str
+    action: str  # "approve" or "reject"
+    expires_at: datetime
+    is_used: bool = False
+    created_at: datetime

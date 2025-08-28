@@ -27,6 +27,7 @@ wheelhouse/
 .coverage.*
 htmlcov/
 coverage.xml
+DEPLOYMENT.md
 
 # Type checking / linters
 .mypy_cache/

@@ -12,3 +12,4 @@ db = client.get_default_database()
 
 users_collection: Collection = db["users"]
 leaves_collection: Collection = db["leave_requests"]
+tokens_collection: Collection = db["approval_tokens"]

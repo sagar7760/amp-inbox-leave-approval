@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends, Request, status, Form
-from app.models.db import leaves_collection, users_collection
+from app.models.db import leaves_collection, users_collection, tokens_collection
 from app.models.schemas import LeaveRequestCreate, LeaveRequest, LeaveActionRequest
 from app.utils.auth import verify_token, verify_password
 from app.utils.email import send_leave_action_email, notify_employee
+from app.utils.tokens import verify_token as verify_approval_token, use_token, revoke_tokens_for_leave
 from bson import ObjectId
 from datetime import datetime, timezone
 from typing import Optional, List
@@ -104,13 +105,17 @@ def process_leave_action(leave_id: str, action: str, user_id: str, comments: Opt
         "status": action,
         "is_action_taken": True,
         "approver_id": ObjectId(user_id),
-        "action_timestamp": datetime.now(timezone.utc).isoformat()
+        "action_timestamp": datetime.now(timezone.utc).isoformat(),
+        "processed_via": "dashboard"
     }
     
     if comments:
         update_data["comments"] = comments
     
     leaves_collection.update_one({"_id": ObjectId(leave_id)}, {"$set": update_data})
+    
+    # Revoke any pending email tokens for this leave
+    revoke_tokens_for_leave(leave_id)
     
     # Notify employee
     notify_employee(leave, action)
@@ -197,3 +202,162 @@ async def approve_from_email(
             "message": "An unexpected error occurred",
             "action": action
         }
+
+@router.post("/approve-with-token")
+async def approve_with_token(
+    token: str = Form(...),
+    leave_id: str = Form(...),
+    manager_id: str = Form(...),
+    password: str = Form(...),
+    action: str = Form(...),
+    comments: str = Form("")
+):
+    """
+    Handle leave approval from AMP email with token + password verification
+    Enhanced security: Both token AND password required
+    """
+    try:
+        # Verify the token first
+        token_doc = verify_approval_token(token)
+        if not token_doc:
+            return {
+                "status": "error",
+                "message": "Invalid or expired security token. Please request a new approval email.",
+                "action": action
+            }
+        
+        # Verify token matches the request
+        if (token_doc["leave_id"] != leave_id or 
+            token_doc["manager_id"] != manager_id or 
+            token_doc["action"] != action):
+            return {
+                "status": "error",
+                "message": "Token validation failed. Security mismatch detected.",
+                "action": action
+            }
+        
+        # Now verify password (manager requirement)
+        manager = users_collection.find_one({"_id": ObjectId(manager_id)})
+        if not manager or not verify_password(password, manager["hashed_password"]):
+            return {
+                "status": "error",
+                "message": "Invalid manager password. Please check your password and try again.",
+                "action": action
+            }
+        
+        # Process the leave action
+        result = process_leave_action_with_password(leave_id, action, manager_id, password, comments)
+        
+        # Mark token as used
+        use_token(token)
+        
+        # Revoke other tokens for this leave request
+        revoke_tokens_for_leave(leave_id)
+        
+        return {
+            "status": "success",
+            "message": result["message"],
+            "action": action
+        }
+        
+    except HTTPException as e:
+        return {
+            "status": "error",
+            "message": str(e.detail),
+            "action": action
+        }
+    except Exception as e:
+        print(f"Token approval error: {str(e)}")
+        return {
+            "status": "error",
+            "message": "An unexpected error occurred during approval",
+            "action": action
+        }
+
+@router.post("/redirect-reject")
+async def redirect_reject(
+    leave_id: str = Form(...),
+    token: str = Form(...),
+    frontend_url: str = Form(...)
+):
+    """
+    AMP-compliant endpoint for rejection redirect
+    Returns redirect URL for AMP.navigateTo action
+    """
+    try:
+        # Verify the token
+        token_doc = verify_approval_token(token)
+        if not token_doc:
+            return {
+                "status": "error",
+                "message": "Invalid or expired security token. Please request a new approval email."
+            }
+        
+        # Verify token matches the request and is for rejection
+        if (token_doc["leave_id"] != leave_id or token_doc["action"] != "reject"):
+            return {
+                "status": "error",
+                "message": "Token validation failed. Security mismatch detected."
+            }
+        
+        # Build the redirect URL with parameters
+        redirect_url = f"{frontend_url}/manager-dashboard?action=reject&leave_id={leave_id}&token={token}"
+        
+        return {
+            "status": "success",
+            "redirect_url": redirect_url,
+            "message": "Redirecting to manager dashboard for rejection workflow"
+        }
+        
+    except Exception as e:
+        print(f"Redirect rejection error: {str(e)}")
+        return {
+            "status": "error",
+            "message": "An unexpected error occurred"
+        }
+
+@router.get("/reject-with-token")
+async def reject_with_token(
+    token: str,
+    redirect: str = "http://localhost:5173/manager/dashboard"
+):
+    """
+    Handle leave rejection via token link - redirects to dashboard
+    Token provides secure access, but rejection requires dashboard interaction
+    """
+    try:
+        # Verify the token
+        token_doc = verify_approval_token(token)
+        if not token_doc:
+            # Redirect to dashboard with error message
+            return f"<html><body><script>window.location.href='{redirect}?error=invalid_token';</script></body></html>"
+        
+        # Verify it's a rejection token
+        if token_doc["action"] != "reject":
+            return f"<html><body><script>window.location.href='{redirect}?error=invalid_action';</script></body></html>"
+        
+        # Mark token as used
+        use_token(token)
+        
+        # Redirect to dashboard with leave ID for rejection
+        dashboard_url = f"{redirect}?reject_leave={token_doc['leave_id']}&token_verified=true"
+        
+        return f"""
+        <html>
+        <head><title>Redirecting to Dashboard</title></head>
+        <body>
+            <h2>Redirecting to Manager Dashboard</h2>
+            <p>You will be redirected to complete the rejection process...</p>
+            <script>
+                setTimeout(function() {{
+                    window.location.href = '{dashboard_url}';
+                }}, 2000);
+            </script>
+            <p><a href="{dashboard_url}">Click here if not redirected automatically</a></p>
+        </body>
+        </html>
+        """
+        
+    except Exception as e:
+        print(f"Token rejection error: {str(e)}")
+        return f"<html><body><script>window.location.href='{redirect}?error=token_error';</script></body></html>"

@@ -59,7 +59,7 @@
     }
     .form-input {
       width: 60%;
-      position:center;
+      position: center;
       padding: 12px;
       border: 2px solid #555;
       border-radius: 6px;
@@ -71,6 +71,11 @@
     .form-input:focus {
       border-color: #60a5fa;
       outline: none;
+    }
+    textarea.form-input {
+      resize: vertical;
+      min-height: 60px;
+      font-family: inherit;
     }
     .btn-group {
         display: flex;
@@ -133,31 +138,36 @@
     </div>
 
     <!--
-      FIXED: The 'action-xhr' attribute is now used instead of 'action'.
-      You must replace the placeholder with your actual server endpoint.
+      Form for approving the leave request.
+      Uses dynamic backend URL for production deployment.
     -->
-    <form method="POST" action-xhr="https://localhost:8000/leave/approve-from-email">
+    <form method="POST" action-xhr="{{ leave.backend_url }}/leave/approve-with-token">
+      <input type="hidden" name="token" value="{{ leave.approval_token }}" />
       <input type="hidden" name="leave_id" value="{{ leave._id }}" />
       <input type="hidden" name="manager_id" value="{{ leave.manager_id }}" />
+      
       <div class="form-group">
-        <label class="form-label">Manager Password: <input class="form-input" type="text" name="password" required placeholder="Enter your password to approve" /></label>
+        <label class="form-label">Manager Password:
+          <input class="form-input" type="text" name="password" required placeholder="Enter your password to approve" />
+        </label>
+        <small style="color: #9ca3af; font-size: 12px;">Password required for security verification</small>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Comments (optional):
+          <textarea class="form-input" name="comments" placeholder="Add any comments..." rows="3"></textarea>
+        </label>
       </div>
       
       <div class="btn-group">
-        <!-- Only approval button for email, rejection will redirect to dashboard -->
         <button class="submit-btn" type="submit" name="action" value="approved">Approve Leave</button>
-        <a href="http://localhost:5173/manager/dashboard" class="submit-btn reject" style="text-decoration: none; text-align: center; display: inline-block; line-height: 1.5;">Go to Dashboard to Reject</a>
       </div>
-
-      <!--
-        Success and error messages are now handled by AMP's built-in templates.
-        Your server's JSON response will populate these messages.
-      -->
+      
       <div submit-success>
         <template type="amp-mustache">
           <div class="success-msg">
             <strong>Success!</strong><br>
-            Leave request for {{employee_name}} has been approved successfully.<br>
+            Leave request has been {{action}} successfully.<br>
             The employee will be notified of your decision.
           </div>
         </template>
@@ -169,6 +179,51 @@
             <strong>Error</strong><br>
             {{message}}<br>
             Please check your password and try again.
+          </div>
+        </template>
+      </div>
+    </form>
+
+    <!--
+      Rejection form that redirects to manager dashboard for full rejection workflow.
+      This allows managers to add comments and handle rejection in the dashboard interface.
+      Uses AMP-compliant redirect method.
+    -->
+    <form method="POST" 
+          action-xhr="{{ leave.backend_url }}/leave/redirect-reject" 
+          on="submit-success:AMP.navigateTo(url=event.response.redirect_url)">
+      <input type="hidden" name="leave_id" value="{{ leave._id }}" />
+      <input type="hidden" name="token" value="{{ leave.rejection_token }}" />
+      <input type="hidden" name="frontend_url" value="{{ leave.frontend_url }}" />
+      
+      <div class="form-group" style="margin-top: 20px;">
+        <div class="btn-group">
+          <button class="submit-btn reject" type="submit">
+            Reject Leave
+          </button>
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
+          <small style="color: #9ca3af; font-size: 12px;">
+            Opens manager dashboard for rejection with comments
+          </small>
+        </div>
+      </div>
+      
+      <div submit-success>
+        <template type="amp-mustache">
+          <div class="success-msg">
+            <strong>Redirecting...</strong><br>
+            Opening manager dashboard for rejection workflow.
+          </div>
+        </template>
+      </div>
+
+      <div submit-error>
+        <template type="amp-mustache">
+          <div class="error-msg">
+            <strong>Error</strong><br>
+            {{message}}<br>
+            Please try again.
           </div>
         </template>
       </div>
