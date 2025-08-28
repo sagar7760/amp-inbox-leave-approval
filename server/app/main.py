@@ -16,11 +16,21 @@ async def add_amp_cors_headers(request: Request, call_next):
     
     # Add AMP-specific CORS headers
     if request.url.path.startswith("/leave/"):
+        # Get the source origin from AMP request
+        amp_source_origin = request.query_params.get("__amp_source_origin")
+        if amp_source_origin:
+            # Decode the email address (URL encoded)
+            import urllib.parse
+            decoded_origin = urllib.parse.unquote(amp_source_origin)
+            response.headers["AMP-Access-Control-Allow-Source-Origin"] = decoded_origin
+        else:
+            # Fallback for non-AMP requests
+            response.headers["AMP-Access-Control-Allow-Source-Origin"] = request.headers.get("Origin", "*")
+        
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "*"
         response.headers["Access-Control-Expose-Headers"] = "*"
-        response.headers["AMP-Access-Control-Allow-Source-Origin"] = request.headers.get("Origin", "*")
         response.headers["Access-Control-Allow-Credentials"] = "true"
     
     return response
