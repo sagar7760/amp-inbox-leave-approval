@@ -147,14 +147,14 @@
     </div>
 
     <!--
-      This div contains all dynamic content (forms, messages) and will be entirely
+      This div contains all dynamic content (forms, messages, status) and will be entirely
       replaced by the submit-success template after a form is submitted.
     -->
     <div id="leave-action-container">
       <!-- Initial state: show the pending status and form -->
       {% if leave.status == 'pending' and not leave.is_action_taken %}
         <p><span class="info-label">Current Status:</span> 
-          <span class="status-badge status-pending">Pending</span>
+          <span class="status-badge status-pending">{{ leave.status|upper }}</span>
         </p>
         
         <form method="POST" action-xhr="{{ leave.backend_url }}/leave/approve-with-token">
@@ -183,13 +183,19 @@
             <template type="amp-mustache">
               <div style="text-align: center; margin-top: 30px;">
                 <div style="padding: 20px; background: #065f46; border-radius: 8px; border: 1px solid #059669;">
-                  <h3 style="color: #d1fae5; margin: 0 0 10px 0;">✅ Leave Request Processed</h3>
-                  <p style="color: #d1fae5; margin: 0;">
-                    Leave request has been <span class="status-badge status-{{status}}">{{status}}</span> successfully.
+                  <h3 style="color: #d1fae5; margin: 0 0 10px 0;">Leave Request {{status}}</h3>
+                  <p style="color: #d1fae5; margin: 0; font-size: 16px; font-weight: 500;">
+                    Leave request has been successfully <strong style="text-transform: uppercase; color: #ffffff;">{{status}}</strong>
                   </p>
-                  <p style="color: #a7f3d0; margin: 10px 0 0 0; font-size: 12px;">
-                    The employee will be notified of your decision.
+                  <p style="color: #a7f3d0; margin: 15px 0 0 0; font-size: 14px;">
+                    📧 The employee has been notified of your decision.
                   </p>
+                  <div style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 6px;">
+                    <p style="color: #a7f3d0; margin: 0; font-size: 12px;">
+                      Current Status: <strong style="text-transform: uppercase;">{{status}}</strong><br>
+                      This email will show the updated status when refreshed.
+                    </p>
+                  </div>
                 </div>
               </div>
             </template>
@@ -200,11 +206,8 @@
               <div style="text-align: center; margin-top: 30px;">
                 <div style="padding: 20px; background: #7f1d1d; border-radius: 8px; border: 1px solid #dc2626;">
                   <h3 style="color: #fecaca; margin: 0 0 10px 0;">❌ Error Processing Request</h3>
-                  <p style="color: #fecaca; margin: 0;">
+                  <p style="color: #fecaca; margin: 0; font-weight: 500;">
                     {{message}}
-                  </p>
-                  <p style="color: #fca5a5; margin: 10px 0 0 0; font-size: 12px;">
-                    Please check the error message above and try again.
                   </p>
                 </div>
               </div>
@@ -229,11 +232,15 @@
       {% else %}
       
       <!-- Already processed message -->
+      <p><span class="info-label">Current Status:</span> 
+        <span class="status-badge status-{{leave.status}}">{{ leave.status|upper }}</span>
+      </p>
+      
       <div style="text-align: center; margin-top: 30px;">
         <div style="padding: 20px; background: #374151; border-radius: 8px; border: 1px solid #6b7280;">
           <h3 style="color: #e5e7eb; margin: 0 0 10px 0;">Leave Request Already Processed</h3>
           <p style="color: #9ca3af; margin: 0;">
-            This leave request has been <span class="status-badge status-{{leave.status}}">{{ leave.status }}</span>. No further action is required.
+            This leave request has been <strong style="text-transform: uppercase; color: #ffffff;">{{ leave.status }}</strong>. No further action is required.
           </p>
           {% if leave.comments %}
           <p style="color: #9ca3af; margin: 10px 0 0 0; font-style: italic;">
