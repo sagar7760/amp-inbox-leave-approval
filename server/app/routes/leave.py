@@ -144,9 +144,12 @@ def process_leave_action_with_password(leave_id: str, action: str, manager_id: s
     if str(leave["manager_id"]) != manager_id:
         raise HTTPException(status_code=403, detail="Only the assigned manager can process this leave request")
     
+    # Convert action to proper status (maintain consistency with API endpoints)
+    status = "approved" if action == "approve" else "rejected" if action == "reject" else action
+    
     # Update leave status
     update_data = {
-        "status": action,
+        "status": status,
         "is_action_taken": True,
         "approver_id": ObjectId(manager_id),
         "action_timestamp": datetime.now(timezone.utc).isoformat(),
@@ -159,11 +162,11 @@ def process_leave_action_with_password(leave_id: str, action: str, manager_id: s
     leaves_collection.update_one({"_id": ObjectId(leave_id)}, {"$set": update_data})
     
     # Notify employee
-    notify_employee(leave, action)
+    notify_employee(leave, status)
     
     return {
-        "status": action,
-        "message": f"Leave request {action} successfully via email.",
+        "status": status,
+        "message": f"Leave request {status} successfully via email.",
         "comments": comments
     }
 
