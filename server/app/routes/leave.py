@@ -271,12 +271,6 @@ async def approve_with_token(
             "action": action
         }
         
-    except HTTPException as e:
-        return {
-            "status": "error",
-            "message": str(e.detail),
-            "action": action
-        }
     except Exception as e:
         print(f"Token approval error: {str(e)}")
         return {
