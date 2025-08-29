@@ -138,7 +138,7 @@ def process_leave_action_with_password(leave_id: str, action: str, manager_id: s
     # Verify manager password
     manager = users_collection.find_one({"_id": ObjectId(manager_id)})
     if not manager or not verify_password(password, manager["hashed_password"]):
-        raise HTTPException(status_code=400, detail="Invalid manager password. Please check your password and try again.")
+        raise HTTPException(status_code=401, detail="Invalid manager password. Please check your password and try again.")
     
     # Verify user is the assigned manager
     if str(leave["manager_id"]) != manager_id:
@@ -257,7 +257,7 @@ async def approve_with_token(
         print(f"   Password verification result: {password_valid}")
         
         if not password_valid:
-            raise HTTPException(status_code=400, detail="Invalid manager password. Please check your password and try again.")
+            raise HTTPException(status_code=401, detail="Invalid manager password. Please check your password and try again.")
         
         # Process the leave action
         result = process_leave_action_with_password(leave_id, action, manager_id, password, comments)
@@ -271,7 +271,7 @@ async def approve_with_token(
         return {
             "status": "success",
             "message": result["message"],
-            "action": action
+            "action": result["status"]  # Use the converted status (approved/rejected)
         }
         
     except Exception as e:
