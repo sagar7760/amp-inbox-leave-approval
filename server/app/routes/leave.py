@@ -217,6 +217,14 @@ async def approve_with_token(
     Enhanced security: Both token AND password required
     """
     try:
+        print(f"🔧 DEBUG - Received approval request:")
+        print(f"   Token: {token[:8]}...")
+        print(f"   Leave ID: {leave_id}")
+        print(f"   Manager ID: {manager_id}")
+        print(f"   Action: '{action}'")
+        print(f"   Password provided: {bool(password)}")
+        print(f"   Comments: '{comments}'")
+        
         # Verify the token first
         token_doc = verify_approval_token(token)
         if not token_doc:
@@ -238,7 +246,30 @@ async def approve_with_token(
         
         # Now verify password (manager requirement)
         manager = users_collection.find_one({"_id": ObjectId(manager_id)})
-        if not manager or not verify_password(password, manager["hashed_password"]):
+        print(f"🔧 DEBUG - Password verification:")
+        print(f"   Manager found: {manager is not None}")
+        print(f"   Manager ID: {manager_id}")
+        print(f"   Received password: '{password}' (length: {len(password) if password else 0})")
+        print(f"   Manager has hashed_password: {bool(manager and 'hashed_password' in manager)}")
+        
+        if not manager:
+            return {
+                "status": "error",
+                "message": "Manager not found in database.",
+                "action": action
+            }
+            
+        if not manager.get("hashed_password"):
+            return {
+                "status": "error",
+                "message": "Manager password not set in database.",
+                "action": action
+            }
+            
+        password_valid = verify_password(password, manager["hashed_password"])
+        print(f"   Password verification result: {password_valid}")
+        
+        if not password_valid:
             return {
                 "status": "error",
                 "message": "Invalid manager password. Please check your password and try again.",
