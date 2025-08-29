@@ -133,12 +133,12 @@ def process_leave_action_with_password(leave_id: str, action: str, manager_id: s
         raise HTTPException(status_code=404, detail="Leave request not found")
     
     if leave.get("is_action_taken"):
-        raise HTTPException(status_code=400, detail="Action already taken on this leave request")
+        raise HTTPException(status_code=400, detail=f"This leave request has already been {leave.get('status', 'processed')}. No further action is required.")
     
     # Verify manager password
     manager = users_collection.find_one({"_id": ObjectId(manager_id)})
     if not manager or not verify_password(password, manager["hashed_password"]):
-        raise HTTPException(status_code=401, detail="Invalid manager password")
+        raise HTTPException(status_code=400, detail="Invalid manager password. Please check your password and try again.")
     
     # Verify user is the assigned manager
     if str(leave["manager_id"]) != manager_id:

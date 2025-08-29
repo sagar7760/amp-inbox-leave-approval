@@ -136,6 +136,7 @@
       <p><span class="info-label">End Date:</span> {{ leave.end_date }}</p>
       <p><span class="info-label">Reason:</span> {{ leave.reason }}</p>
       <p><span class="info-label">Status:</span> 
+        <span id="leave-status">
         {% if leave.status == 'approved' %}
           <span style="color: #10b981; font-weight: bold; text-transform: uppercase;">{{ leave.status }}</span>
         {% elif leave.status == 'rejected' %}
@@ -143,6 +144,7 @@
         {% else %}
           <span style="color: #f59e0b; font-weight: bold; text-transform: uppercase;">{{ leave.status }}</span>
         {% endif %}
+        </span>
       </p>
     </div>
 
@@ -171,15 +173,19 @@
       </div>
       
       <div class="btn-group">
-        <button class="submit-btn" type="submit" name="action" value="approve">Approve Leave</button>
+        <button class="submit-btn" type="submit" name="action" value="approved">Approve Leave</button>
       </div>
       
       <div submit-success>
         <template type="amp-mustache">
           <div class="success-msg">
             <strong>Success!</strong><br>
-            Leave request has been {{action}} successfully.<br>
-            The employee will be notified of your decision.
+            Leave request has been <strong style="text-transform: uppercase;">{{action}}</strong> successfully.<br>
+            The employee will be notified of your decision.<br><br>
+            <small style="color: #a7f3d0; font-size: 12px;">
+              Status updated to: <strong style="text-transform: uppercase;">{{action}}</strong><br>
+              Please refresh this email to see the updated status above.
+            </small>
           </div>
         </template>
       </div>
@@ -187,9 +193,12 @@
       <div submit-error>
         <template type="amp-mustache">
           <div class="error-msg">
-            <strong>Error</strong><br>
+            <strong>Unable to Process Request</strong><br>
             {{message}}<br>
-            Please check your password and try again.
+            <small style="color: #fca5a5; font-size: 12px; margin-top: 8px; display: block;">
+              If this was a password error, please double-check your credentials. 
+              If the request was already processed, please refresh your email.
+            </small>
           </div>
         </template>
       </div>
