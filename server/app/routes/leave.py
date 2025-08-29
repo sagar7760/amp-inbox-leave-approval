@@ -272,6 +272,9 @@ async def approve_with_token(
         }
         
     except Exception as e:
+        # Don't catch HTTPException - let it bubble up for proper status codes
+        if isinstance(e, HTTPException):
+            raise e
         print(f"Token approval error: {str(e)}")
         return {
             "status": "error",
