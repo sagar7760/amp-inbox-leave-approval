@@ -120,6 +120,15 @@
       border: 1px solid #dc2626;
       color: #fecaca;
     }
+    .status-badge {
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    .status-approved { background-color: #10b981; }
+    .status-rejected { background-color: #ef4444; }
+    .status-pending { background-color: #f59e0b; }
   </style>
 </head>
 <body>
@@ -135,112 +144,107 @@
       <p><span class="info-label">Start Date:</span> {{ leave.start_date }}</p>
       <p><span class="info-label">End Date:</span> {{ leave.end_date }}</p>
       <p><span class="info-label">Reason:</span> {{ leave.reason }}</p>
-      <p><span class="info-label">Status:</span> 
-        <span id="leave-status">
-        {% if leave.status == 'approved' %}
-          <span style="color: #10b981; font-weight: bold; text-transform: uppercase;">{{ leave.status }}</span>
-        {% elif leave.status == 'rejected' %}
-          <span style="color: #ef4444; font-weight: bold; text-transform: uppercase;">{{ leave.status }}</span>
-        {% else %}
-          <span style="color: #f59e0b; font-weight: bold; text-transform: uppercase;">{{ leave.status }}</span>
-        {% endif %}
-        </span>
-      </p>
     </div>
-
-    {% if leave.status == 'pending' and not leave.is_action_taken %}
 
     <!--
-      Form for approving the leave request.
-      Uses dynamic backend URL for production deployment.
+      This div contains all dynamic content (forms, messages) and will be entirely
+      replaced by the submit-success template after a form is submitted.
     -->
-    <form method="POST" action-xhr="{{ leave.backend_url }}/leave/approve-with-token">
-      <input type="hidden" name="token" value="{{ leave.approval_token }}" />
-      <input type="hidden" name="leave_id" value="{{ leave._id }}" />
-      <input type="hidden" name="manager_id" value="{{ leave.manager_id }}" />
-      
-      <div class="form-group">
-        <label class="form-label">Manager Password:
-          <input class="form-input" type="text" name="password" required placeholder="Enter your password to approve" />
-        </label>
-        <small style="color: #9ca3af; font-size: 12px;">Password required for security verification (visible for AMP compatibility)</small>
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">Comments (optional):
-          <textarea class="form-input" name="comments" placeholder="Add any comments..." rows="3"></textarea>
-        </label>
-      </div>
-      
-      <div class="btn-group">
-        <button class="submit-btn" type="submit" name="action" value="approve">Approve Leave</button>
-      </div>
-      
-      <div submit-success>
-        <template type="amp-mustache">
-          <div class="success-msg">
-            <strong>Success!</strong><br>
-            Leave request has been <strong style="text-transform: uppercase;">{{action}}</strong> successfully.<br>
-            The employee will be notified of your decision.<br><br>
-            <small style="color: #a7f3d0; font-size: 12px;">
-              Status updated to: <strong style="text-transform: uppercase;">{{action}}</strong><br>
-              Please refresh this email to see the updated status above.
+    <div id="leave-action-container">
+      <!-- Initial state: show the pending status and form -->
+      {% if leave.status == 'pending' and not leave.is_action_taken %}
+        <p><span class="info-label">Current Status:</span> 
+          <span class="status-badge status-pending">Pending</span>
+        </p>
+        
+        <form method="POST" action-xhr="{{ leave.backend_url }}/leave/approve-with-token">
+          <input type="hidden" name="token" value="{{ leave.approval_token }}" />
+          <input type="hidden" name="leave_id" value="{{ leave._id }}" />
+          <input type="hidden" name="manager_id" value="{{ leave.manager_id }}" />
+          
+          <div class="form-group">
+            <label class="form-label">Manager Password:
+              <input class="form-input" type="text" name="password" required placeholder="Enter your password to approve" />
+            </label>
+            <small style="color: #9ca3af; font-size: 12px;">Password required for security verification (visible for AMP compatibility)</small>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Comments (optional):
+              <textarea class="form-input" name="comments" placeholder="Add any comments..." rows="3"></textarea>
+            </label>
+          </div>
+          
+          <div class="btn-group">
+            <button class="submit-btn" type="submit" name="action" value="approve">Approve Leave</button>
+          </div>
+          
+          <div submit-success>
+            <template type="amp-mustache">
+              <div style="text-align: center; margin-top: 30px;">
+                <div style="padding: 20px; background: #065f46; border-radius: 8px; border: 1px solid #059669;">
+                  <h3 style="color: #d1fae5; margin: 0 0 10px 0;">✅ Leave Request Processed</h3>
+                  <p style="color: #d1fae5; margin: 0;">
+                    Leave request has been <span class="status-badge status-{{status}}">{{status}}</span> successfully.
+                  </p>
+                  <p style="color: #a7f3d0; margin: 10px 0 0 0; font-size: 12px;">
+                    The employee will be notified of your decision.
+                  </p>
+                </div>
+              </div>
+            </template>
+          </div>
+  
+          <div submit-error>
+            <template type="amp-mustache">
+              <div style="text-align: center; margin-top: 30px;">
+                <div style="padding: 20px; background: #7f1d1d; border-radius: 8px; border: 1px solid #dc2626;">
+                  <h3 style="color: #fecaca; margin: 0 0 10px 0;">❌ Error Processing Request</h3>
+                  <p style="color: #fecaca; margin: 0;">
+                    {{message}}
+                  </p>
+                  <p style="color: #fca5a5; margin: 10px 0 0 0; font-size: 12px;">
+                    Please check the error message above and try again.
+                  </p>
+                </div>
+              </div>
+            </template>
+          </div>
+        </form>
+
+        <!-- Rejection redirects to dashboard -->
+        <div style="text-align: center; margin-top: 20px;">
+          <a href="{{ leave.frontend_url }}/manager/dashboard" 
+             class="submit-btn reject" 
+             style="text-decoration: none; display: inline-block; width: 40%;">
+            Reject Leave
+          </a>
+          <div style="margin-top: 10px;">
+            <small style="color: #9ca3af; font-size: 12px;">
+              Opens manager dashboard for rejection with comments
             </small>
           </div>
-        </template>
-      </div>
+        </div>
 
-      <div submit-error>
-        <template type="amp-mustache">
-          <div class="error-msg">
-            <strong>Unable to Process Request</strong><br>
-            {{message}}<br>
-            <small style="color: #fca5a5; font-size: 12px; margin-top: 8px; display: block;">
-              Please check the error message above for specific details. If you need assistance, contact your IT administrator.
-            </small>
-          </div>
-        </template>
+      {% else %}
+      
+      <!-- Already processed message -->
+      <div style="text-align: center; margin-top: 30px;">
+        <div style="padding: 20px; background: #374151; border-radius: 8px; border: 1px solid #6b7280;">
+          <h3 style="color: #e5e7eb; margin: 0 0 10px 0;">Leave Request Already Processed</h3>
+          <p style="color: #9ca3af; margin: 0;">
+            This leave request has been <span class="status-badge status-{{leave.status}}">{{ leave.status }}</span>. No further action is required.
+          </p>
+          {% if leave.comments %}
+          <p style="color: #9ca3af; margin: 10px 0 0 0; font-style: italic;">
+            Comments: {{ leave.comments }}
+          </p>
+          {% endif %}
+        </div>
       </div>
-    </form>
-
-    <!--
-      Rejection link redirects to manager dashboard for full rejection workflow.
-      This allows managers to add comments and handle rejection in the dashboard interface.
-      Uses direct link to dashboard endpoint.
-    -->
-    <div class="form-group" style="margin-top: 20px;">
-      <div class="btn-group">
-        <a href="{{ leave.frontend_url }}/manager/dashboard" 
-           class="submit-btn reject" 
-           style="text-decoration: none; display: inline-block; text-align: center; line-height: 1.2;">
-          Reject Leave
-        </a>
-      </div>
-      <div style="text-align: center; margin-top: 10px;">
-        <small style="color: #9ca3af; font-size: 12px;">
-          Opens manager dashboard - login required if not authenticated
-        </small>
-      </div>
+      
+      {% endif %}
     </div>
-    
-    {% else %}
-    
-    <!-- Already processed message -->
-    <div class="form-group" style="margin-top: 30px; text-align: center;">
-      <div style="padding: 20px; background: #374151; border-radius: 8px; border: 1px solid #6b7280;">
-        <h3 style="color: #e5e7eb; margin: 0 0 10px 0;">Leave Request Already Processed</h3>
-        <p style="color: #9ca3af; margin: 0;">
-          This leave request has been {{ leave.status }}. No further action is required.
-        </p>
-        {% if leave.comments %}
-        <p style="color: #9ca3af; margin: 10px 0 0 0; font-style: italic;">
-          Comments: {{ leave.comments }}
-        </p>
-        {% endif %}
-      </div>
-    </div>
-    
-    {% endif %}
   </div>
 </body>
 </html>

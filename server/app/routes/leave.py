@@ -269,9 +269,9 @@ async def approve_with_token(
         revoke_tokens_for_leave(leave_id)
         
         return {
-            "status": "success",
+            "success": True,
             "message": result["message"],
-            "action": result["status"]  # Use the converted status (approved/rejected)
+            "status": result["status"]  # Return the converted status (approved/rejected)
         }
         
     except Exception as e:
