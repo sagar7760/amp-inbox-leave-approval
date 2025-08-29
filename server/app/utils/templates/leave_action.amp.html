@@ -135,7 +135,18 @@
       <p><span class="info-label">Start Date:</span> {{ leave.start_date }}</p>
       <p><span class="info-label">End Date:</span> {{ leave.end_date }}</p>
       <p><span class="info-label">Reason:</span> {{ leave.reason }}</p>
+      <p><span class="info-label">Status:</span> 
+        {% if leave.status == 'approved' %}
+          <span style="color: #10b981; font-weight: bold; text-transform: uppercase;">{{ leave.status }}</span>
+        {% elif leave.status == 'rejected' %}
+          <span style="color: #ef4444; font-weight: bold; text-transform: uppercase;">{{ leave.status }}</span>
+        {% else %}
+          <span style="color: #f59e0b; font-weight: bold; text-transform: uppercase;">{{ leave.status }}</span>
+        {% endif %}
+      </p>
     </div>
+
+    {% if leave.status == 'pending' and not leave.is_action_taken %}
 
     <!--
       Form for approving the leave request.
@@ -160,7 +171,7 @@
       </div>
       
       <div class="btn-group">
-        <button class="submit-btn" type="submit" name="action" value="approved">Approve Leave</button>
+        <button class="submit-btn" type="submit" name="action" value="approve">Approve Leave</button>
       </div>
       
       <div submit-success>
@@ -187,11 +198,11 @@
     <!--
       Rejection link redirects to manager dashboard for full rejection workflow.
       This allows managers to add comments and handle rejection in the dashboard interface.
-      Uses direct link approach for AMP email compatibility.
+      Uses direct link to dashboard endpoint.
     -->
     <div class="form-group" style="margin-top: 20px;">
       <div class="btn-group">
-        <a href="{{ leave.frontend_url }}/manager-dashboard?action=reject&leave_id={{ leave._id }}&token={{ leave.rejection_token }}" 
+        <a href="{{ leave.frontend_url }}/manager-dashboard" 
            class="submit-btn reject" 
            style="text-decoration: none; display: inline-block; text-align: center; line-height: 1.2;">
           Reject Leave
@@ -199,10 +210,29 @@
       </div>
       <div style="text-align: center; margin-top: 10px;">
         <small style="color: #9ca3af; font-size: 12px;">
-          Opens manager dashboard in new tab for rejection with comments
+          Opens manager dashboard - login required if not authenticated
         </small>
       </div>
     </div>
+    
+    {% else %}
+    
+    <!-- Already processed message -->
+    <div class="form-group" style="margin-top: 30px; text-align: center;">
+      <div style="padding: 20px; background: #374151; border-radius: 8px; border: 1px solid #6b7280;">
+        <h3 style="color: #e5e7eb; margin: 0 0 10px 0;">Leave Request Already Processed</h3>
+        <p style="color: #9ca3af; margin: 0;">
+          This leave request has been {{ leave.status }}. No further action is required.
+        </p>
+        {% if leave.comments %}
+        <p style="color: #9ca3af; margin: 10px 0 0 0; font-style: italic;">
+          Comments: {{ leave.comments }}
+        </p>
+        {% endif %}
+      </div>
+    </div>
+    
+    {% endif %}
   </div>
 </body>
 </html>
