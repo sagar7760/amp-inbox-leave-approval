@@ -228,21 +228,13 @@ async def approve_with_token(
         # Verify the token first
         token_doc = verify_approval_token(token)
         if not token_doc:
-            return {
-                "status": "error",
-                "message": "Invalid or expired security token. Please request a new approval email.",
-                "action": action
-            }
+            raise HTTPException(status_code=400, detail="Invalid or expired security token. Please request a new approval email.")
         
         # Verify token matches the request
         if (token_doc["leave_id"] != leave_id or 
             token_doc["manager_id"] != manager_id or 
             token_doc["action"] != action):
-            return {
-                "status": "error",
-                "message": "Token validation failed. Security mismatch detected.",
-                "action": action
-            }
+            raise HTTPException(status_code=400, detail="Token validation failed. Security mismatch detected.")
         
         # Now verify password (manager requirement)
         manager = users_collection.find_one({"_id": ObjectId(manager_id)})
@@ -253,28 +245,16 @@ async def approve_with_token(
         print(f"   Manager has hashed_password: {bool(manager and 'hashed_password' in manager)}")
         
         if not manager:
-            return {
-                "status": "error",
-                "message": "Manager not found in database.",
-                "action": action
-            }
+            raise HTTPException(status_code=400, detail="Manager not found in database.")
             
         if not manager.get("hashed_password"):
-            return {
-                "status": "error",
-                "message": "Manager password not set in database.",
-                "action": action
-            }
+            raise HTTPException(status_code=400, detail="Manager password not set in database.")
             
         password_valid = verify_password(password, manager["hashed_password"])
         print(f"   Password verification result: {password_valid}")
         
         if not password_valid:
-            return {
-                "status": "error",
-                "message": "Invalid manager password. Please check your password and try again.",
-                "action": action
-            }
+            raise HTTPException(status_code=400, detail="Invalid manager password. Please check your password and try again.")
         
         # Process the leave action
         result = process_leave_action_with_password(leave_id, action, manager_id, password, comments)
