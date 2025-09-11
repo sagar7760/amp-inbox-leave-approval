@@ -8,8 +8,84 @@
   
   <style amp4email-boilerplate>body{visibility:hidden}</style>
   
+  <!-- Fallback template for non-AMP email clients -->
+  <template type="amp-mustache">
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Leave Request Notification</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #2e3034;">
+
+        <!-- Outer table for centering and setting max width -->
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+            <tr>
+                <td style="padding: 20px 0;">
+                    <!-- Inner table for the email content container -->
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; margin: auto; background-color: #202124; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <tr>
+                            <td style="padding: 40px; text-align: center;">
+
+                                <!-- Fallback Header -->
+                                <h1 style="margin: 0 0 20px; font-size: 24px; color: #4285f4; font-weight: 600;">Leave Request Approval</h1>
+                                <p style="margin: 0 0 20px; font-size: 16px; line-height: 24px; color: #b0b0b0;">
+                                    A new leave request requires your approval. Please review the details below.
+                                </p>
+
+                                <!-- Employee Details -->
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 20px; text-align: left; color: #b0b0b0;">
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong style="color: #ffffff;">Employee:</strong> {{ leave.employee_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong style="color: #ffffff;">Department:</strong> {{ leave.employee_department }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong style="color: #ffffff;">Leave Type:</strong> {{ leave.leave_type }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong style="color: #ffffff;">Start Date:</strong> {{ leave.start_date }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong style="color: #ffffff;">End Date:</strong> {{ leave.end_date }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 0;"><strong style="color: #ffffff;">Reason:</strong> {{ leave.reason }}</td>
+                                    </tr>
+                                </table>
+
+                                <!-- Call-to-Action Button -->
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: auto;">
+                                    <tr>
+                                        <td style="border-radius: 6px; background: linear-gradient(135deg, #4285f4, #007bff); text-align: center; padding: 2px;">
+                                            <a href="{{ leave.frontend_url }}/manager/dashboard" target="_blank" style="font-size: 16px; font-weight: 600; text-decoration: none; padding: 12px 24px; color: #ffffff; display: inline-block; border-radius: 4px; background-color: #4285f4; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+                                                Go to Dashboard
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Note -->
+                                <p style="margin: 20px 0 0; font-size: 12px; color: #888; font-style: italic;">
+                                    Your email client doesn't support interactive emails. Click the button above to approve or reject this request.
+                                </p>
+
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+    </body>
+    </html>
+  </template>
+  
   <style amp-custom>
-    /* New styling based on the previous working template */
+    /* AMP-specific styling for interactive email */
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
       background: #1a1a1a;
@@ -132,6 +208,34 @@
   </style>
 </head>
 <body>
+  <!-- Fallback for non-AMP clients -->
+  <div fallback>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #2e3034; color: #ffffff; padding: 40px; border-radius: 8px;">
+      <h1 style="color: #4285f4; text-align: center; margin-bottom: 20px;">Leave Request Approval</h1>
+      <p style="color: #b0b0b0; text-align: center; margin-bottom: 30px;">A new leave request requires your approval.</p>
+      
+      <div style="margin-bottom: 20px; color: #b0b0b0;">
+        <p><strong style="color: #ffffff;">Employee:</strong> {{ leave.employee_name }}</p>
+        <p><strong style="color: #ffffff;">Department:</strong> {{ leave.employee_department }}</p>
+        <p><strong style="color: #ffffff;">Leave Type:</strong> {{ leave.leave_type }}</p>
+        <p><strong style="color: #ffffff;">Start Date:</strong> {{ leave.start_date }}</p>
+        <p><strong style="color: #ffffff;">End Date:</strong> {{ leave.end_date }}</p>
+        <p><strong style="color: #ffffff;">Reason:</strong> {{ leave.reason }}</p>
+      </div>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <a href="{{ leave.frontend_url }}/manager/dashboard" style="display: inline-block; background: linear-gradient(135deg, #4285f4, #007bff); color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600;">
+          Go to Dashboard
+        </a>
+      </div>
+      
+      <p style="color: #888; font-size: 12px; text-align: center; margin-top: 20px; font-style: italic;">
+        Your email client doesn't support interactive emails. Click the button above to approve or reject this request.
+      </p>
+    </div>
+  </div>
+
+  <!-- AMP Email Content -->
   <div class="email-card">
     <div class="header">
       <h1>Leave Request Approval</h1>
