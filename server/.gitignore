@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 start_server.bat
+
 # Environments
 .venv/
 venv/
@@ -18,7 +19,6 @@ dist/
 *.egg-info/
 pip-wheel-metadata/
 wheelhouse/
-
 # Testing
 .pytest_cache/
 .tox/

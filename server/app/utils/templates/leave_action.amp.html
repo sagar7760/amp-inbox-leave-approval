@@ -9,43 +9,107 @@
   <style amp4email-boilerplate>body{visibility:hidden}</style>
   
   <style amp-custom>
-    /* New styling based on the previous working template */
+    /* Responsive AMP email styling */
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
       background: #1a1a1a;
       color: #ffffff;
       margin: 0;
-      padding: 20px;
+      padding: 10px;
     }
     .email-card {
       background: #2d2d2d;
       border-radius: 12px;
-      padding: 50px;
+      padding: 30px;
       border: 1px solid #444;
       max-width: 600px;
       margin: 0 auto;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 600px) {
+      body { padding: 5px; }
+      .email-card { 
+        padding: 20px;
+        border-radius: 8px;
+        margin: 0;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .email-card { 
+        padding: 15px;
+      }
     }
     .header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
     .header h1 {
       color: #60a5fa;
       font-size: 28px;
       margin: 0 0 10px 0;
+      line-height: 1.2;
     }
     .header p {
       color: #9ca3af;
       margin: 0;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    
+    /* Mobile header adjustments */
+    @media (max-width: 600px) {
+      .header h1 { font-size: 24px; }
+      .header p { font-size: 14px; }
+    }
+    
+    @media (max-width: 480px) {
+      .header h1 { font-size: 20px; }
+      .header p { font-size: 13px; }
     }
     .info-group {
-        margin-bottom: 15px;
-        line-height: 1.5;
+        margin-bottom: 20px;
+        line-height: 1.6;
+        background: #3a3a3a;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #555;
+    }
+    .info-group p {
+        margin: 8px 0;
+        font-size: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
     }
     .info-label {
         font-weight: 600;
         color: #e5e7eb;
+        min-width: 100px;
+        margin-right: 10px;
+    }
+    
+    /* Mobile info group adjustments */
+    @media (max-width: 480px) {
+      .info-group { 
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+      .info-group p {
+        font-size: 13px;
+        flex-direction: column;
+        align-items: flex-start;
+        margin: 6px 0;
+      }
+      .info-label {
+        margin-right: 0;
+        margin-bottom: 2px;
+        min-width: auto;
+      }
     }
     .form-group {
       margin-bottom: 20px;
@@ -56,10 +120,10 @@
       font-weight: 600;
       margin-bottom: 8px;
       font-size: 14px;
+      line-height: 1.4;
     }
     .form-input {
-      width: 60%;
-      position: center;
+      width: 100%;
       padding: 12px;
       border: 2px solid #555;
       border-radius: 6px;
@@ -74,14 +138,27 @@
     }
     textarea.form-input {
       resize: vertical;
-      min-height: 60px;
+      min-height: 80px;
       font-family: inherit;
+      line-height: 1.4;
+    }
+    
+    /* Mobile form adjustments */
+    @media (max-width: 480px) {
+      .form-input { 
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 14px;
+      }
+      textarea.form-input {
+        min-height: 60px;
+      }
     }
     .btn-group {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         justify-content: center;
-        margin-top: 20px;
+        margin-top: 25px;
+        flex-wrap: wrap;
     }
     .submit-btn {
       background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
@@ -92,8 +169,11 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      width: 40%;
+      min-width: 140px;
+      text-align: center;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      flex: 1;
+      max-width: 200px;
     }
     .submit-btn:hover {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -104,11 +184,49 @@
     .submit-btn.reject:hover {
       background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
     }
+    
+    /* Mobile button adjustments */
+    @media (max-width: 600px) {
+      .btn-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .submit-btn {
+        width: 100%;
+        max-width: none;
+        padding: 16px 20px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      /* Ensure reject link button has same sizing as form button */
+      .submit-btn.reject {
+        width: 100%;
+        max-width: none;
+        padding: 16px 20px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .submit-btn {
+        padding: 18px 20px;
+        font-size: 17px; /* Slightly larger for better touch targets */
+        box-sizing: border-box;
+      }
+      /* Ensure reject link button has same sizing as form button on small devices */
+      .submit-btn.reject {
+        padding: 18px 20px;
+        font-size: 17px;
+        box-sizing: border-box;
+      }
+    }
     .success-msg, .error-msg {
-      padding: 15px;
-      border-radius: 6px;
+      padding: 20px;
+      border-radius: 8px;
       margin-top: 20px;
       text-align: center;
+      line-height: 1.5;
     }
     .success-msg {
       background: #065f46;
@@ -119,6 +237,14 @@
       background: #7f1d1d;
       border: 1px solid #dc2626;
       color: #fecaca;
+    }
+    
+    /* Mobile message adjustments */
+    @media (max-width: 480px) {
+      .success-msg, .error-msg {
+        padding: 15px;
+        font-size: 14px;
+      }
     }
     .status-badge {
         font-weight: bold;
@@ -143,6 +269,7 @@
       <p><span class="info-label">Leave Type:</span> {{ leave.leave_type }}</p>
       <p><span class="info-label">Start Date:</span> {{ leave.start_date }}</p>
       <p><span class="info-label">End Date:</span> {{ leave.end_date }}</p>
+      <p><span class="info-label">Total Days:</span> {{ leave.total_days }} day(s)</p>
       <p><span class="info-label">Reason:</span> {{ leave.reason }}</p>
     </div>
 
@@ -205,17 +332,17 @@
         </form>
 
         <!-- Rejection redirects to dashboard -->
-        <div style="text-align: center; margin-top: 20px;">
+        <div class="btn-group" style="margin-top: 15px;">
           <a href="{{ leave.frontend_url }}/manager/dashboard" 
              class="submit-btn reject" 
-             style="text-decoration: none; display: inline-block; width: 40%;">
+             style="text-decoration: none; display: inline-block;">
             Reject Leave
           </a>
-          <div style="margin-top: 10px;">
-            <small style="color: #9ca3af; font-size: 12px;">
-              Opens manager dashboard for rejection with comments
-            </small>
-          </div>
+        </div>
+        <div style="text-align: center; margin-top: 12px;">
+          <small style="color: #9ca3af; font-size: 12px; line-height: 1.4; display: block;">
+            Opens manager dashboard for rejection with comments
+          </small>
         </div>
 
       {% else %}

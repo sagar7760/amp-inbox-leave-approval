@@ -13,6 +13,24 @@
         #outlook a { padding: 0; }
         img { -ms-interpolation-mode: bicubic; }
         body { margin: 0; padding: 0; }
+        
+        /* Mobile responsiveness */
+        @media only screen and (max-width: 600px) {
+            .email-container { width: 100% !important; }
+            .email-content { padding: 20px !important; }
+            .header-title { font-size: 22px !important; }
+            .header-text { font-size: 14px !important; }
+            .info-row { display: block !important; }
+            .info-label { width: 100% !important; display: block !important; margin-bottom: 5px !important; }
+            .button-container { padding: 20px !important; }
+        }
+        
+        @media only screen and (max-width: 480px) {
+            .email-content { padding: 15px !important; }
+            .header-title { font-size: 20px !important; }
+            .details-container { padding: 15px !important; }
+            .reason-container { padding: 15px !important; }
+        }
     </style>
     <!--[if mso]>
     <noscript>
@@ -29,51 +47,51 @@
     <!-- Outer table for centering and setting max width -->
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 0; padding: 0;">
         <tr>
-            <td style="padding: 20px 0; vertical-align: top;">
+            <td style="padding: 20px 10px; vertical-align: top;">
                 <!-- Inner table for the email content container -->
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; margin: 0 auto; background-color: #2e3034; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" class="email-container" style="border-collapse: collapse; margin: 0 auto; background-color: #2e3034; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); max-width: 600px; width: 100%;">
                     <tr>
-                        <td style="padding: 40px; text-align: center;">
+                        <td class="email-content" style="padding: 40px; text-align: center;">
 
                             <!-- Header -->
-                            <h1 style="margin: 0 0 20px; font-size: 28px; color: #60a5fa; font-weight: 600; line-height: 1.2;">Leave Request Approval</h1>
-                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 24px; color: #9ca3af;">
+                            <h1 class="header-title" style="margin: 0 0 20px; font-size: 28px; color: #60a5fa; font-weight: 600; line-height: 1.2;">Leave Request Approval</h1>
+                            <p class="header-text" style="margin: 0 0 30px; font-size: 16px; line-height: 24px; color: #9ca3af;">
                                 A new leave request requires your approval. Please review the details below.
                             </p>
 
                             <!-- Employee Details Card -->
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 30px 0; background-color: #3a3a3a; border-radius: 8px; border: 1px solid #555;">
                                 <tr>
-                                    <td style="padding: 25px;">
+                                    <td class="details-container" style="padding: 25px;">
                                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
-                                            <tr>
+                                            <tr class="info-row">
                                                 <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
-                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Employee:</strong> {{ leave.employee_name }}
+                                                    <strong class="info-label" style="color: #ffffff; display: inline-block; width: 120px;">Employee:</strong> {{ leave.employee_name }}
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr class="info-row">
                                                 <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
-                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Department:</strong> {{ leave.employee_department }}
+                                                    <strong class="info-label" style="color: #ffffff; display: inline-block; width: 120px;">Department:</strong> {{ leave.employee_department }}
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr class="info-row">
                                                 <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
-                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Leave Type:</strong> {{ leave.leave_type }}
+                                                    <strong class="info-label" style="color: #ffffff; display: inline-block; width: 120px;">Leave Type:</strong> {{ leave.leave_type }}
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr class="info-row">
                                                 <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
-                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Start Date:</strong> {{ leave.start_date }}
+                                                    <strong class="info-label" style="color: #ffffff; display: inline-block; width: 120px;">Start Date:</strong> {{ leave.start_date }}
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr class="info-row">
                                                 <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
-                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">End Date:</strong> {{ leave.end_date }}
+                                                    <strong class="info-label" style="color: #ffffff; display: inline-block; width: 120px;">End Date:</strong> {{ leave.end_date }}
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr class="info-row">
                                                 <td style="padding: 8px 0; color: #e5e7eb; font-size: 14px;">
-                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Days:</strong> {{ leave.total_days }}
+                                                    <strong class="info-label" style="color: #ffffff; display: inline-block; width: 120px;">Total Days:</strong> {{ leave.total_days }} day(s)
                                                 </td>
                                             </tr>
                                         </table>
@@ -84,7 +102,7 @@
                             <!-- Reason Section -->
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 20px 0; background-color: #3a3a3a; border-radius: 8px; border: 1px solid #555;">
                                 <tr>
-                                    <td style="padding: 20px; text-align: left;">
+                                    <td class="reason-container" style="padding: 20px; text-align: left;">
                                         <h3 style="margin: 0 0 10px; color: #ffffff; font-size: 16px; font-weight: 600;">Reason for Leave:</h3>
                                         <p style="margin: 0; color: #e5e7eb; font-size: 14px; line-height: 1.6;">{{ leave.reason }}</p>
                                     </td>
@@ -94,34 +112,41 @@
                             <!-- Call to Action -->
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 30px 0;">
                                 <tr>
-                                    <td style="text-align: center;">
-                                        <p style="margin: 0 0 20px; color: #9ca3af; font-size: 16px;">
+                                    <td class="button-container" style="text-align: center; padding: 0 20px;">
+                                        <p style="margin: 0 0 20px; color: #9ca3af; font-size: 16px; line-height: 1.5;">
                                             Click the button below to review and take action on this leave request:
                                         </p>
                                         
-                                        <!-- Button with fallback for Outlook -->
-                                        <!--[if mso]>
-                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ leave.frontend_url }}/manager/dashboard" style="height:50px;width:200px;v-text-anchor:middle;" arcsize="16%" stroke="f" fillcolor="#60a5fa">
-                                            <w:anchorlock/>
-                                            <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:600;">Go to Dashboard</center>
-                                        </v:roundrect>
-                                        <![endif]-->
-                                        <!--[if !mso]><!-->
-                                        <a href="{{ leave.frontend_url }}/manager/dashboard" 
-                                           style="display: inline-block; 
-                                                  background: linear-gradient(135deg, #60a5fa, #3b82f6); 
-                                                  color: #ffffff; 
-                                                  padding: 15px 30px; 
-                                                  text-decoration: none; 
-                                                  border-radius: 8px; 
-                                                  font-weight: 600; 
-                                                  font-size: 16px; 
-                                                  font-family: Arial, sans-serif;
-                                                  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                                                  transition: all 0.2s ease;">
-                                            Go to Dashboard
-                                        </a>
-                                        <!--<![endif]-->
+                                        <!-- Enhanced button with better background -->
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                                            <tr>
+                                                <td style="background: linear-gradient(135deg, #60a5fa, #3b82f6); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                                                    <!--[if mso]>
+                                                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ leave.frontend_url }}/manager/dashboard" style="height:50px;width:200px;v-text-anchor:middle;" arcsize="16%" stroke="f" fillcolor="#60a5fa">
+                                                        <w:anchorlock/>
+                                                        <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:600;">Go to Dashboard</center>
+                                                    </v:roundrect>
+                                                    <![endif]-->
+                                                    <!--[if !mso]><!-->
+                                                    <a href="{{ leave.frontend_url }}/manager/dashboard" 
+                                                       style="display: inline-block; 
+                                                              background: transparent; 
+                                                              color: #ffffff; 
+                                                              padding: 15px 30px; 
+                                                              text-decoration: none; 
+                                                              font-weight: 600; 
+                                                              font-size: 16px; 
+                                                              font-family: Arial, sans-serif;
+                                                              line-height: 1;
+                                                              border-radius: 8px;
+                                                              min-width: 140px;
+                                                              text-align: center;">
+                                                        Go to Dashboard
+                                                    </a>
+                                                    <!--<![endif]-->
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>
