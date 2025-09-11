@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Leave Request Notification</title>
+    <style type="text/css">
+        /* Outlook specific fixes */
+        .ExternalClass { width: 100%; }
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+        table { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        #outlook a { padding: 0; }
+        img { -ms-interpolation-mode: bicubic; }
+        body { margin: 0; padding: 0; }
+    </style>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+
+    <!-- Outer table for centering and setting max width -->
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 0; padding: 0;">
+        <tr>
+            <td style="padding: 20px 0; vertical-align: top;">
+                <!-- Inner table for the email content container -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; margin: 0 auto; background-color: #2e3034; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <tr>
+                        <td style="padding: 40px; text-align: center;">
+
+                            <!-- Header -->
+                            <h1 style="margin: 0 0 20px; font-size: 28px; color: #60a5fa; font-weight: 600; line-height: 1.2;">Leave Request Approval</h1>
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 24px; color: #9ca3af;">
+                                A new leave request requires your approval. Please review the details below.
+                            </p>
+
+                            <!-- Employee Details Card -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 30px 0; background-color: #3a3a3a; border-radius: 8px; border: 1px solid #555;">
+                                <tr>
+                                    <td style="padding: 25px;">
+                                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;">
+                                            <tr>
+                                                <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
+                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Employee:</strong> {{ leave.employee_name }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
+                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Department:</strong> {{ leave.employee_department }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
+                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Leave Type:</strong> {{ leave.leave_type }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
+                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Start Date:</strong> {{ leave.start_date }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; border-bottom: 1px solid #555; color: #e5e7eb; font-size: 14px;">
+                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">End Date:</strong> {{ leave.end_date }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #e5e7eb; font-size: 14px;">
+                                                    <strong style="color: #ffffff; display: inline-block; width: 120px;">Days:</strong> {{ leave.total_days }}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Reason Section -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 20px 0; background-color: #3a3a3a; border-radius: 8px; border: 1px solid #555;">
+                                <tr>
+                                    <td style="padding: 20px; text-align: left;">
+                                        <h3 style="margin: 0 0 10px; color: #ffffff; font-size: 16px; font-weight: 600;">Reason for Leave:</h3>
+                                        <p style="margin: 0; color: #e5e7eb; font-size: 14px; line-height: 1.6;">{{ leave.reason }}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Call to Action -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 30px 0;">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <p style="margin: 0 0 20px; color: #9ca3af; font-size: 16px;">
+                                            Click the button below to review and take action on this leave request:
+                                        </p>
+                                        
+                                        <!-- Button with fallback for Outlook -->
+                                        <!--[if mso]>
+                                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ leave.frontend_url }}/manager/dashboard" style="height:50px;width:200px;v-text-anchor:middle;" arcsize="16%" stroke="f" fillcolor="#60a5fa">
+                                            <w:anchorlock/>
+                                            <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:16px;font-weight:600;">Go to Dashboard</center>
+                                        </v:roundrect>
+                                        <![endif]-->
+                                        <!--[if !mso]><!-->
+                                        <a href="{{ leave.frontend_url }}/manager/dashboard" 
+                                           style="display: inline-block; 
+                                                  background: linear-gradient(135deg, #60a5fa, #3b82f6); 
+                                                  color: #ffffff; 
+                                                  padding: 15px 30px; 
+                                                  text-decoration: none; 
+                                                  border-radius: 8px; 
+                                                  font-weight: 600; 
+                                                  font-size: 16px; 
+                                                  font-family: Arial, sans-serif;
+                                                  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                                                  transition: all 0.2s ease;">
+                                            Go to Dashboard
+                                        </a>
+                                        <!--<![endif]-->
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Footer -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-top: 30px; border-top: 1px solid #555; padding-top: 20px;">
+                                <tr>
+                                    <td style="text-align: center; padding-top: 20px;">
+                                        <p style="margin: 0; color: #888; font-size: 12px; line-height: 1.5;">
+                                            This notification was sent by the Leave Management System.<br>
+                                            Please log in to your dashboard to approve or reject this request.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

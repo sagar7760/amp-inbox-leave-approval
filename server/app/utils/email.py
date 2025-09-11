@@ -73,15 +73,22 @@ def send_leave_action_email(leave_dict):
         print(f"   Rejection Token: {rejection_token[:8]}...")
         
         # Render AMP email with embedded form
-        template = env.get_template("leave_action.amp.html")
-        html_content = template.render(leave=leave_dict)
+        amp_template = env.get_template("leave_action.amp.html")
+        amp_content = amp_template.render(leave=leave_dict)
+        
+        # Render HTML fallback email for non-AMP clients (like Outlook)
+        html_template = env.get_template("leave_action_fallback.html")
+        html_content = html_template.render(leave=leave_dict)
         
         msg = EmailMessage()
         msg["Subject"] = f"Leave Request {leave_dict.get('status', 'Approval').title()} - {leave_dict.get('employee_name', 'Employee')}"
         msg["From"] = EMAIL_USER
         msg["To"] = leave_dict["manager_email"]
-        msg.set_content("This is an AMP email. Please use a compatible email client to see the interactive form.")
-        msg.add_alternative(html_content, subtype="x-amp-html")
+        
+        # Set HTML as primary content for better compatibility
+        msg.set_content("Please enable HTML to view this email properly.")
+        msg.add_alternative(html_content, subtype="html")
+        msg.add_alternative(amp_content, subtype="x-amp-html")
         
         with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:
             server.starttls()
@@ -89,7 +96,8 @@ def send_leave_action_email(leave_dict):
             server.send_message(msg)
         
         status_text = leave_dict.get('status', 'pending')
-        print(f"AMP email notification sent successfully for {status_text} leave request from {leave_dict.get('employee_name', 'Employee')}")
+        print(f"Multi-format email notification sent successfully for {status_text} leave request from {leave_dict.get('employee_name', 'Employee')}")
+        print(f"Email formats: HTML (fallback) + AMP (interactive) sent to {leave_dict['manager_email']}")
         print(f"Generated tokens - Approval: {approval_token[:8]}..., Rejection: {rejection_token[:8]}...")
         
     except Exception as e:
