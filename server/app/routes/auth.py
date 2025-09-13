@@ -81,7 +81,7 @@ def test_email():
         # Create test leave data
         test_leave = {
             "employee_name": "Test Employee",
-            "manager_email": "sagarsoradi011@gmail.com",  # Send to your own email for testing
+            "manager_email": "manager@company.com",  # Replace with actual manager email for testing
             "leave_type": "Annual Leave",
             "start_date": "2025-09-01",
             "end_date": "2025-09-03",
